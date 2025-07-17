@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variable Pay Bonus Calculator - FY 2024/25</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            border: 2px solid #fbbf24;
+            backdrop-filter: blur(10px);
+        }
+
+        .disclaimer strong {
+            color: #fbbf24;
+            font-size: 1.1em;
+        }
+
+        .chatgpt-warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            backdrop-filter: blur(10px);
+        }
+
+        .chatgpt-warning strong {
+            color: #fef2f2;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .accuracy-warning {
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            backdrop-filter: blur(10px);
+        }
+
+        .accuracy-warning strong {
+            color: #fef3c7;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid #4f46e5;
+        }
+
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .section h3 {
+            color: #475569;
+            font-size: 1.2em;
+            margin: 20px 0 15px 0;
+        }
+
+        .eligibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .eligibility-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .eligibility-item.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .eligibility-item.error {
+            border-left-color: #ef4444;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #4f46e5;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .calculator h2 {
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.9);
+            color: #1e293b;
+            font-size: 1em;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251,191,36,0.3);
+        }
+
+        .calculate-btn {
+            background: #fbbf24;
+            color: #1e293b;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .calculate-btn:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .result h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .result-details {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.95em;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .icon {
+            font-size: 1.3em;
+            margin-right: 5px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #92400e;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #1e40af;
+        }
+
+        .tax-info {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #0c4a6e;
+        }
+
+        .tax-info strong {
+            color: #0369a1;
+        }
+
+        .tax-link {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid #0ea5e9;
+            transition: all 0.3s ease;
+        }
+
+        .tax-link:hover {
+            color: #0369a1;
+            border-bottom-color: #0369a1;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .disclaimer, .chatgpt-warning, .accuracy-warning {
+                padding: 15px;
+                font-size: 0.85em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .section {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .section h2 {
+                font-size: 1.3em;
+            }
+
+            .section h3 {
+                font-size: 1.1em;
+            }
+
+            .eligibility-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .eligibility-item {
+                padding: 15px;
+            }
+
+            .calculator {
+                padding: 15px;
+            }
+
+            .calculator h2 {
+                font-size: 1.5em;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-group {
+                padding: 15px;
+            }
+
+            .calculate-btn {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+
+            .result {
+                padding: 15px;
+            }
+
+            .result h3 {
+                font-size: 1.5em;
+            }
+
+            .result-details {
+                padding: 15px;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                padding: 8px 0;
+            }
+
+            .result-item:last-child {
+                font-size: 1em;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 0.8em;
+            }
+
+            .icon {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .disclaimer, .chatgpt-warning, .accuracy-warning {
+                font-size: 0.8em;
+            }
+
+            .section h2 {
+                font-size: 1.2em;
+            }
+
+            .calculator h2 {
+                font-size: 1.3em;
+            }
+
+            .form-group label {
+                font-size: 0.9em;
+            }
+
+            .form-group input, .form-group select {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 6px;
+                font-size: 0.75em;
+            }
+
+            table {
+                min-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Variable Pay Calculator</h1>
+            <p>Calculate your bonus for Financial Year 2024/25</p>
+            
+            <div class="chatgpt-warning">
+                <strong>🚨 Stop Guessing Your Bonus!</strong> 
+                <p>I know many of you have been using ChatGPT to figure out your bonus — but let’s be real, it can get confusing or inaccurate sometimes! 😅</p>
+            </div>
+
+            <div class="accuracy-warning">
+                <strong>⚠️ UNOFFICIAL & POTENTIALLY INACCURATE:</strong> 
+                <p>This calculator is unofficial and may contain errors. Results should be treated as estimates only. <span class="highlight">Please verify with official HR communications.</span></p>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <strong>🔒 PRIVACY GUARANTEE:</strong> This website does not store, collect, or steal any of your data. 
+                All calculations are performed locally in your browser. 
+                <br><strong>🔍 Transparency:</strong> You can inspect the source code by right-clicking → "View Page Source" or pressing F12.
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Eligibility Section -->
+            <div class="section">
+                <h2><span class="icon">✅</span>Eligibility Criteria</h2>
+                <div class="eligibility-grid">
+                    <div class="eligibility-item">
+                        <h3>✓ Service Period</h3>
+                        <p>Minimum 6 months of continuous service as of 31 March 2025</p>
+                        <p><strong>Eligible:</strong> Employees who joined on or before 1 October 2024</p>
+                    </div>
+                    <div class="eligibility-item warning">
+                        <h3>⚠️ Pro-rated Payout</h3>
+                        <p>Employees who joined between 1 April 2024 and 1 October 2024</p>
+                        <p>Payout will be calculated based on completed months of service</p>
+                    </div>
+                    <div class="eligibility-item error">
+                        <h3>❌ Not Eligible</h3>
+                        <p>Employees serving notice period during payout processing</p>
+                        <p>Employees who joined after 1 October 2024</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Band Information -->
+            <div class="section">
+                <h2><span class="icon">📊</span>Employee Band Structure</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Band</th>
+                                <th>Category</th>
+                                <th>Target Pay (% of Fixed)</th>
+                                <th>Organizational Weight</th>
+                                <th>Individual Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1-2</td>
+                                <td>Leadership</td>
+                                <td>33%</td>
+                                <td>70%</td>
+                                <td>30%</td>
+                            </tr>
+                            <tr>
+                                <td>3-4</td>
+                                <td>Senior/Mid Management</td>
+                                <td>20%</td>
+                                <td>60%</td>
+                                <td>40%</td>
+                            </tr>
+                            <tr>
+                                <td>5-6</td>
+                                <td>Junior Managers/TL/Senior Executive</td>
+                                <td>15%</td>
+                                <td>40%</td>
+                                <td>60%</td>
+                            </tr>
+                            <tr>
+                                <td>7-8</td>
+                                <td>Executives/Associates</td>
+                                <td>10%</td>
+                                <td>30%</td>
+                                <td>70%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Rating Multipliers -->
+            <div class="section">
+                <h2><span class="icon">⭐</span>Performance Rating Multipliers</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rating</th>
+                                <th>Individual Multiplier</th>
+                                <th>Organizational Multiplier</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>0%</td>
+                                <td>0%</td>
+                                <td>Below Expectations</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>50%</td>
+                                <td>0%</td>
+                                <td>Partially Meets Expectations</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>100%</td>
+                                <td>100%</td>
+                                <td>Meets Expectations</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>120%</td>
+                                <td>120%</td>
+                                <td>Exceeds Expectations</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>150%</td>
+                                <td>150%</td>
+                                <td>Outstanding Performance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="info-box">
+                    <strong>Note:</strong> Company's organizational performance rating for FY 2024/25 is <strong>3</strong> (based on EBITDA achievement)
+                </div>
+            </div>
+
+            <!-- Calculator -->
+            <div class="calculator">
+                <h2>🧮 Calculate Your Variable Pay</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="band">Employee Band</label>
+                        <select id="band">
+                            <option value="">Select your band</option>
+                            <option value="1-2">Band 1-2 (Leadership)</option>
+                            <option value="3-4">Band 3-4 (Senior/Mid Management)</option>
+                            <option value="5-6">Band 5-6 (Junior Managers/TL/Senior Executive)</option>
+                            <option value="7-8">Band 7-8 (Executives/Associates)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salary">Monthly Consolidated Salary (LKR)</label>
+                        <input type="number" id="salary" placeholder="e.g., 100000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="individual-rating">Individual Performance Rating</label>
+                        <select id="individual-rating">
+                            <option value="">Select rating</option>
+                            <option value="1">1 - Below Expectations</option>
+                            <option value="2">2 - Partially Meets Expectations</option>
+                            <option value="3">3 - Meets Expectations</option>
+                            <option value="4">4 - Exceeds Expectations</option>
+                            <option value="5">5 - Outstanding Performance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service-months">Service Months (as of 31 March 2025)</label>
+                        <select id="service-months">
+                            <option value="">Select months</option>
+                            <option value="6">6 months</option>
+                            <option value="7">7 months</option>
+                            <option value="8">8 months</option>
+                            <option value="9">9 months</option>
+                            <option value="10">10 months</option>
+                            <option value="11">11 months</option>
+                            <option value="12">12 months</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interim-pay">Interim Pay Received in Dec 2024 (LKR)</label>
+                        <input type="number" id="interim-pay" placeholder="e.g., 50000" value="0">
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateBonus()">Calculate My Bonus</button>
+            </div>
+
+            <!-- Result -->
+            <div class="result" id="result">
+                <h3>Your Variable Pay Calculation</h3>
+                <div class="result-details" id="result-details">
+                    <!-- Results will be populated here -->
+                </div>
+                <div class="tax-info">
+                    <strong>💰 Next Step - Calculate Your Tax:</strong>
+                    <p>Now that you have your bonus amount, calculate the tax deductions using: <a href="https://www.taxadvisor.lk/calculator/cal-2025" target="_blank" class="tax-link">www.taxadvisor.lk/calculator/cal-2025</a></p>
+                </div>
+            </div>
+
+            <!-- Example Calculations -->
+            <div class="section">
+                <h2><span class="icon">💡</span>Example Calculations</h2>
+                
+                <h3>Example 1: Band 5-6 Employee</h3>
+                <div class="warning-box">
+                    <strong>Details:</strong> Band 5-6, LKR 100,000 monthly salary, individual rating 2, organizational rating 3, 12 months service
+                </div>
+                <p><strong>Formula:</strong> Monthly Salary × 12 × [(Target% × Org Weight × Org Multiplier) + (Target% × Individual Weight × Individual Multiplier)]</p>
+                <p><strong>Calculation:</strong> LKR 100,000 × 12 × [(15% × 40% × 100%) + (15% × 60% × 50%)]</p>
+                <p><strong>Result:</strong> LKR 100,000 × 12 × [6% + 4.5%] = LKR 100,000 × 12 × 10.5% = LKR 126,000</p>
+                <p><strong>Final Payout:</strong> LKR 126,000 - LKR 50,000 (interim) = <strong>LKR 76,000</strong></p>
+
+                <h3>Example 2: Band 7-8 Employee (Pro-rated)</h3>
+                <div class="warning-box">
+                    <strong>Details:</strong> Band 7-8, LKR 100,000 monthly salary, individual rating 3, organizational rating 3, 8 months service
+                </div>
+                <p><strong>Formula:</strong> Monthly Salary × 12 × [(Target% × Org Weight × Org Multiplier) + (Target% × Individual Weight × Individual Multiplier)]</p>
+                <p><strong>Calculation:</strong> LKR 100,000 × 12 × [(10% × 30% × 100%) + (10% × 70% × 100%)]</p>
+                <p><strong>Annual Bonus:</strong> LKR 100,000 × 12 × [3% + 7%] = LKR 100,000 × 12 × 10% = LKR 120,000</p>
+                <p><strong>Pro-rated (8/12 months):</strong> LKR 120,000 × 8/12 = LKR 80,000</p>
+                <p><strong>Final Payout:</strong> LKR 80,000 - LKR 0 (no interim pay) = <strong>LKR 80,000</strong></p>
+            </div>
+
+            <!-- Employee Band Information -->
+            <div class="section">
+                <h2><span class="icon">🔍</span>How to Find Your Employee Band</h2>
+                <div class="info-box">
+                    <strong>Steps to check your band in Peopleshr system:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Click on <strong>Employee Information</strong></li>
+                        <li>Select <strong>Profile Overview</strong> under My Profile</li>
+                        <li>On the top left, click on <strong>View Report</strong></li>
+                        <li>In the generated report, scroll down to <strong>Job & Workstation Details</strong> section</li>
+                        <li>Your <strong>Employee Group</strong> will be listed there</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Tax Information -->
+            <div class="section">
+                <h2><span class="icon">📊</span>Important Tax Information</h2>
+                <div class="warning-box">
+                    <strong>⚠️ Tax Deduction Notice:</strong> 
+                    <p>Please note that relevant government taxes will be deducted from your final payout amount as per Sri Lankan tax regulations. The amounts calculated above are gross amounts before tax deductions.</p>
+                    <p>For detailed tax calculations, please visit: <a href="https://www.taxadvisor.lk/calculator/cal-2025" target="_blank" class="tax-link">https://www.taxadvisor.lk/calculator/cal-2025</a></p>
+                </div>
+            </div>
+        </div>
+
+    <p>Crafted by <strong style="color: #000000;">Shahid</strong></p>
+</footer>
+    </div>
+
+    <script>
+        function calculateBonus() {
+            const band = document.getElementById('band').value;
+            const salary = parseFloat(document.getElementById('salary').value);
+            const individualRating = parseInt(document.getElementById('individual-rating').value);
+            const serviceMonths = parseInt(document.getElementById('service-months').value);
+            const interimPay = parseFloat(document.getElementById('interim-pay').value) || 0;
+
+            if (!band || !salary || !individualRating || !serviceMonths) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Band configuration
+            const bandConfig = {
+                '1-2': { target: 33, orgWeight: 70, indWeight: 30 },
+                '3-4': { target: 20, orgWeight: 60, indWeight: 40 },
+                '5-6': { target: 15, orgWeight: 40, indWeight: 60 },
+                '7-8': { target: 10, orgWeight: 30, indWeight: 70 }
+            };
+
+            // Rating multipliers
+            const multipliers = {
+                1: { individual: 0, organizational: 0 },
+                2: { individual: 50, organizational: 0 },
+                3: { individual: 100, organizational: 100 },
+                4: { individual: 120, organizational: 120 },
+                5: { individual: 150, organizational: 150 }
+            };
+
+            const config = bandConfig[band];
+            const individualMultiplier = multipliers[individualRating].individual;
+            const orgMultiplier = multipliers[3].organizational; // Company rating is 3
+
+            // Calculate components
+            const annualSalary = salary * 12;
+            const targetPercent = config.target / 100;
+            const orgComponent = targetPercent * (config.orgWeight / 100) * (orgMultiplier / 100);
+            const indComponent = targetPercent * (config.indWeight / 100) * (individualMultiplier / 100);
+            const totalMultiplier = orgComponent + indComponent;
+            
+            // Calculate gross bonus
+            let grossBonus = annualSalary * totalMultiplier;
+            
+            // Apply pro-ration if service is less than 12 months
+            if (serviceMonths < 12) {
+                grossBonus = grossBonus * (serviceMonths / 12);
+            }
+            
+            // Final payout after deducting interim pay
+            const finalPayout = Math.max(0, grossBonus - interimPay);
+
+            // Display results
+            displayResults({
+                annualSalary,
+                band,
+                individualRating,
+                serviceMonths,
+                targetPercent: config.target,
+                orgWeight: config.orgWeight,
+                indWeight: config.indWeight,
+                orgMultiplier,
+                individualMultiplier,
+                orgComponent: orgComponent * 100,
+                indComponent: indComponent * 100,
+                totalMultiplier: totalMultiplier * 100,
+                grossBonus,
+                interimPay,
+                finalPayout
+            });
+        }
+
+        function displayResults(data) {
+            const resultDiv = document.getElementById('result');
+            const detailsDiv = document.getElementById('result-details');
+            
+            const formatCurrency = (amount) => `LKR ${amount.toLocaleString('en-US')}`;
+            const formatPercent = (percent) => `${percent.toFixed(2)}%`;
+            
+            detailsDiv.innerHTML = `
+                <div class="result-item">
+                    <span>Annual Salary:</span>
+                    <span>${formatCurrency(data.annualSalary)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Employee Band:</span>
+                    <span>${data.band}</span>
+                </div>
+                <div class="result-item">
+                    <span>Target Variable Pay:</span>
+                    <span>${data.targetPercent}% of fixed pay</span>
+                </div>
+                <div class="result-item">
+                    <span>Individual Rating:</span>
+                    <span>${data.individualRating} (${data.individualMultiplier}% multiplier)</span>
+                </div>
+                <div class="result-item">
+                    <span>Organizational Rating:</span>
+                    <span>3 (${data.orgMultiplier}% multiplier)</span>
+                </div>
+                <div class="result-item">
+                    <span>Service Months:</span>
+                    <span>${data.serviceMonths} months</span>
+                </div>
+                <div class="result-item">
+                    <span>Organizational Component:</span>
+                    <span>${formatPercent(data.orgComponent)} (${data.orgWeight}% weight)</span>
+                </div>
+                <div class="result-item">
+                    <span>Individual Component:</span>
+                    <span>${formatPercent(data.indComponent)} (${data.indWeight}% weight)</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Multiplier:</span>
+                    <span>${formatPercent(data.totalMultiplier)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Gross Bonus:</span>
+                    <span>${formatCurrency(data.grossBonus)}</span>
+                </div>
+                <div class="result-item">
+                    <span>Less: Interim Pay:</span>
+                    <span>${formatCurrency(data.interimPay)}</span>
+                </div>
+                <div class="result-item">
+                    <span><strong>Final Payout (July 2025):</strong></span>
+                    <span><strong>${formatCurrency(data.finalPayout)}</strong></span>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
